@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('transaction_details', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('transaction_head_id')->constrained()->onDelete('cascade');
+            $table->foreignId('service_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('service_name', 150);
+            $table->string('service_category', 100)->nullable();
+            $table->decimal('unit_price', 12, 2);
+            $table->integer('qty')->default(1);
+            $table->decimal('discount', 12, 2)->default(0);
+            $table->decimal('subtotal', 14, 2);
+            $table->text('notes')->nullable();
+            $table->timestamps();
+
+            $table->index('transaction_head_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('transaction_details');
+    }
+};
