@@ -1,69 +1,63 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pricelist - {{ config('app.name', 'Wash Hub') }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
+    <style>
+        :root{--gold:#f59e0b;--gold-light:#fbbf24;--gold-dark:#d97706;--dark:#0c0a09;--dark-2:#1c1917;--stone-100:#f5f5f4;--stone-200:#e7e5e4;--stone-500:#78716c}
+        *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--stone-100);color:var(--dark)}
+    </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-        <div class="max-w-5xl mx-auto px-4 py-12 text-center">
-            <h1 class="text-4xl font-bold mb-2">🚗 Wash Hub</h1>
-            <p class="text-indigo-200 text-lg">Professional Car Wash Service</p>
-            <p class="text-indigo-300 text-sm mt-2">{{ \App\Models\Setting::getValue('app_address', '') }}</p>
-            <div class="mt-6">
-                <a href="{{ route('login') }}" class="inline-block px-6 py-2 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition mr-2">Login</a>
-                <a href="{{ route('register') }}" class="inline-block px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-400 transition border border-indigo-400">Daftar Member</a>
+<body>
+    <div style="background:var(--dark);color:white;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(245,158,11,.15) 0%,transparent 60%),radial-gradient(ellipse at 70% 20%,rgba(251,191,36,.1) 0%,transparent 50%)"></div>
+        <div style="max-width:900px;margin:0 auto;padding:3rem 1.5rem;text-align:center;position:relative;z-index:1">
+            <h1 style="font-family:'Space Mono',monospace;font-size:2.5rem;font-weight:700">Wash<span style="color:var(--gold-light)">Hub</span></h1>
+            <p style="color:var(--stone-500);font-size:1rem;margin-top:.5rem">Professional Car Wash Service</p>
+            <p style="color:rgba(255,255,255,.3);font-size:.82rem;margin-top:.25rem">{{ \App\Models\Setting::getValue('app_address', '') }}</p>
+            <div style="margin-top:1.5rem;display:flex;justify-content:center;gap:.75rem">
+                <a href="{{ route('login') }}" style="padding:.65rem 1.5rem;background:var(--gold);color:var(--dark);font-weight:700;border-radius:8px;text-decoration:none;font-size:.9rem">Login</a>
+                <a href="{{ route('register') }}" style="padding:.65rem 1.5rem;background:rgba(255,255,255,.08);color:white;font-weight:600;border-radius:8px;text-decoration:none;font-size:.9rem;border:1px solid rgba(255,255,255,.12)">Daftar Member</a>
             </div>
         </div>
     </div>
 
-    <!-- Pricelist -->
-    <div class="max-w-5xl mx-auto px-4 py-10">
-        <h2 class="text-2xl font-bold text-gray-800 text-center mb-8">Daftar Harga Layanan</h2>
-
+    <div style="max-width:900px;margin:0 auto;padding:2.5rem 1.5rem">
+        <h2 style="font-size:1.5rem;font-weight:800;text-align:center;margin-bottom:2rem">Daftar Harga Layanan</h2>
         @foreach($categories as $cat)
-        <div class="mb-8">
-            <h3 class="text-lg font-bold text-gray-700 mb-3 flex items-center">
-                <span class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-2 text-sm">{{ $loop->iteration }}</span>
-                {{ $cat->name }}
-                @if($cat->description)<span class="text-sm font-normal text-gray-500 ml-2">- {{ $cat->description }}</span>@endif
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div style="margin-bottom:2rem">
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem">
+                <span style="width:32px;height:32px;border-radius:8px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:700;font-size:.82rem">{{ $loop->iteration }}</span>
+                <h3 style="font-size:1rem;font-weight:700">{{ $cat->name }}</h3>
+                @if($cat->description)<span style="font-size:.78rem;color:var(--stone-500)">— {{ $cat->description }}</span>@endif
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem">
                 @foreach($cat->activeServices as $svc)
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-semibold text-gray-800">{{ $svc->name }}</h4>
-                            <p class="text-xs text-gray-500 mt-0.5">{{ $svc->duration_minutes }} menit • {{ $svc->vehicle_type === 'all' ? 'Semua kendaraan' : ucfirst($svc->vehicle_type) }}</p>
-                            @if($svc->description)<p class="text-xs text-gray-400 mt-1">{{ $svc->description }}</p>@endif
-                        </div>
-                        <span class="text-lg font-bold text-indigo-600 whitespace-nowrap ml-3">Rp {{ number_format($svc->price, 0, ',', '.') }}</span>
+                <div style="background:white;border-radius:12px;border:1px solid var(--stone-200);padding:1rem;transition:all .15s;cursor:default" onmouseover="this.style.borderColor='var(--gold)';this.style.boxShadow='0 4px 12px rgba(245,158,11,.1)'" onmouseout="this.style.borderColor='var(--stone-200)';this.style.boxShadow='none'">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                        <div><h4 style="font-size:.9rem;font-weight:700">{{ $svc->name }}</h4><p style="font-size:.72rem;color:var(--stone-500);margin-top:.2rem">{{ $svc->duration_minutes }} menit • {{ $svc->vehicle_type==='all'?'Semua':ucfirst($svc->vehicle_type) }}</p>@if($svc->description)<p style="font-size:.72rem;color:var(--stone-500);margin-top:.2rem">{{ $svc->description }}</p>@endif</div>
+                        <span style="font-size:1rem;font-weight:800;color:var(--gold-dark);white-space:nowrap;margin-left:.75rem">Rp {{ number_format($svc->price,0,',','.') }}</span>
                     </div>
-                    @if($svc->points_earned > 0)
-                    <div class="mt-2"><span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded font-medium">+{{ $svc->points_earned }} poin</span></div>
-                    @endif
+                    @if($svc->points_earned>0)<div style="margin-top:.5rem"><span style="background:rgba(245,158,11,.12);color:var(--gold-dark);padding:.15rem .5rem;border-radius:4px;font-size:.68rem;font-weight:600">+{{ $svc->points_earned }} poin</span></div>@endif
                 </div>
                 @endforeach
             </div>
         </div>
         @endforeach
 
-        <!-- Loyalty Info -->
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 text-white text-center mt-8">
-            <h3 class="text-xl font-bold mb-2">🎉 Program Loyalitas</h3>
-            <p class="text-yellow-100">Cuci 10x dapat 1x cuci <span class="font-bold text-white">GRATIS!</span></p>
-            <p class="text-yellow-200 text-sm mt-1">Daftar member sekarang untuk mulai kumpulkan poin.</p>
-            <a href="{{ route('register') }}" class="inline-block mt-4 px-6 py-2 bg-white text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition">Daftar Sekarang</a>
+        <div style="background:var(--dark);border-radius:16px;padding:2rem;text-align:center;margin-top:2rem;position:relative;overflow:hidden">
+            <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(245,158,11,.1)"></div>
+            <h3 style="color:var(--gold-light);font-size:1.25rem;font-weight:800">🎉 Program Loyalitas</h3>
+            <p style="color:rgba(255,255,255,.5);margin-top:.5rem">Cuci 10x dapat 1x cuci <span style="color:var(--gold-light);font-weight:700">GRATIS!</span></p>
+            <a href="{{ route('register') }}" style="display:inline-block;margin-top:1rem;padding:.75rem 2rem;background:var(--gold);color:var(--dark);font-weight:700;border-radius:8px;text-decoration:none">Daftar Sekarang</a>
         </div>
     </div>
 
-    <!-- Footer -->
-    <div class="bg-gray-800 text-gray-400 text-center py-6 text-sm mt-10">
-        <p>&copy; {{ date('Y') }} {{ config('app.name', 'Wash Hub') }}. All rights reserved.</p>
-        <p class="mt-1">{{ \App\Models\Setting::getValue('app_phone', '') }}</p>
+    <div style="background:var(--dark);color:var(--stone-500);text-align:center;padding:1.5rem;font-size:.78rem;margin-top:2rem">
+        <p>&copy; {{ date('Y') }} {{ config('app.name','Wash Hub') }}</p>
+        <p style="margin-top:.25rem">{{ \App\Models\Setting::getValue('app_phone','') }}</p>
     </div>
 </body>
 </html>

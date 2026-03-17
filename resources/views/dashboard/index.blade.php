@@ -1,178 +1,91 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
-
-@section('header')
-    <div class="flex items-center justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
-        <a href="{{ route('transactions.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-            + Transaksi Baru
-        </a>
-    </div>
-@endsection
+@section('header')<h2>Dashboard</h2><p>{{ now()->translatedFormat('l, d F Y') }}</p>@endsection
+@section('actions')<a href="{{ route('transactions.create') }}" class="btn-gold"><span>+</span> Transaksi Baru</a>@endsection
 
 @section('content')
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Transaksi Hari Ini</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $todayTransactions }}</p>
-                </div>
-                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <span class="text-2xl">🧾</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Revenue Hari Ini</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">Rp {{ number_format($todayRevenue, 0, ',', '.') }}</p>
-                </div>
-                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                    <span class="text-2xl">💰</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Revenue Bulan Ini</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">Rp {{ number_format($monthlyRevenue, 0, ',', '.') }}</p>
-                </div>
-                <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center">
-                    <span class="text-2xl">📊</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Total Customers</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalCustomers }}</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                    <span class="text-2xl">👥</span>
-                </div>
-            </div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+    @php $cards = [
+        ['Transaksi Hari Ini', $todayTransactions, '🧾', 'var(--gold-50)', 'var(--gold)'],
+        ['Revenue Hari Ini', 'Rp '.number_format($todayRevenue,0,',','.'), '💰', '#f0fdf4', '#16a34a'],
+        ['Revenue Bulan Ini', 'Rp '.number_format($monthlyRevenue,0,',','.'), '📊', '#eff6ff', '#2563eb'],
+        ['Total Customer', $totalCustomers, '👥', '#faf5ff', '#9333ea'],
+    ]; @endphp
+    @foreach($cards as $c)
+    <div class="card stat-card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><p class="stat-label">{{ $c[0] }}</p><p class="stat-value">{{ $c[1] }}</p></div>
+            <div class="stat-icon" style="background:{{ $c[3] }}"><span style="font-size:1.3rem">{{ $c[2] }}</span></div>
         </div>
     </div>
+    @endforeach
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <!-- Revenue Chart -->
-        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Revenue 7 Hari Terakhir</h3>
-            <canvas id="revenueChart" height="200"></canvas>
-        </div>
-
-        <!-- Top Services -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Layanan Terpopuler</h3>
-            <div class="space-y-3">
-                @forelse($topServices as $i => $svc)
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs flex items-center justify-center font-bold mr-3">{{ $i + 1 }}</span>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">{{ $svc->service_name }}</p>
-                            <p class="text-xs text-gray-500">{{ $svc->total_sold }}x terjual</p>
-                        </div>
-                    </div>
-                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($svc->revenue, 0, ',', '.') }}</span>
-                </div>
-                @empty
-                <p class="text-sm text-gray-500">Belum ada data</p>
-                @endforelse
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+    <div class="card" style="padding:1.25rem">
+        <h3 style="font-size:.95rem;font-weight:700;color:var(--dark);margin-bottom:1rem">Revenue 7 Hari Terakhir</h3>
+        <canvas id="revenueChart" height="220"></canvas>
+    </div>
+    <div class="card" style="padding:1.25rem">
+        <h3 style="font-size:.95rem;font-weight:700;color:var(--dark);margin-bottom:1rem">Top Layanan</h3>
+        @forelse($topServices as $i => $svc)
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;{{ !$loop->last ? 'border-bottom:1px solid var(--stone-100)' : '' }}">
+            <div style="display:flex;align-items:center;gap:.65rem">
+                <span style="width:24px;height:24px;border-radius:6px;background:{{ $i===0?'var(--gold-100)':'var(--stone-100)' }};display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:{{ $i===0?'var(--gold-dark)':'var(--stone-500)' }}">{{ $i+1 }}</span>
+                <div><p style="font-size:.82rem;font-weight:600;color:var(--dark)">{{ $svc->service_name }}</p><p style="font-size:.7rem;color:var(--stone-500)">{{ $svc->total_sold }}x terjual</p></div>
             </div>
+            <span style="font-size:.78rem;font-weight:700;color:var(--dark)">Rp {{ number_format($svc->revenue,0,',','.') }}</span>
         </div>
+        @empty
+        <p style="color:var(--stone-500);font-size:.85rem;text-align:center;padding:2rem 0">Belum ada data</p>
+        @endforelse
     </div>
+</div>
 
-    <!-- Active Washes -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Antrian Cuci Aktif ({{ $activeWashes->count() }})</h3>
-        @if($activeWashes->count() > 0)
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead><tr class="border-b border-gray-200">
-                    <th class="text-left py-3 px-3 font-medium text-gray-500">Invoice</th>
-                    <th class="text-left py-3 px-3 font-medium text-gray-500">Customer</th>
-                    <th class="text-left py-3 px-3 font-medium text-gray-500">Plat</th>
-                    <th class="text-left py-3 px-3 font-medium text-gray-500">Layanan</th>
-                    <th class="text-left py-3 px-3 font-medium text-gray-500">Status</th>
-                    <th class="text-left py-3 px-3 font-medium text-gray-500">Aksi</th>
-                </tr></thead>
-                <tbody>
-                @foreach($activeWashes as $wash)
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="py-3 px-3 font-mono text-xs">{{ $wash->invoice_number }}</td>
-                    <td class="py-3 px-3">{{ $wash->customerProfile->user->name ?? 'Walk-in' }}</td>
-                    <td class="py-3 px-3 font-semibold">{{ $wash->plate_number }}</td>
-                    <td class="py-3 px-3">
-                        @foreach($wash->details as $d)
-                            <span class="inline-block bg-gray-100 text-gray-700 text-xs rounded px-2 py-0.5 mr-1 mb-1">{{ $d->service_name }}</span>
-                        @endforeach
-                    </td>
-                    <td class="py-3 px-3">
-                        @if($wash->wash_status === 'waiting')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Menunggu</span>
-                        @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Sedang Dicuci</span>
-                        @endif
-                    </td>
-                    <td class="py-3 px-3">
-                        <form method="POST" action="{{ route('transactions.update-status', $wash) }}" class="inline">
-                            @csrf @method('PATCH')
-                            @if($wash->wash_status === 'waiting')
-                                <input type="hidden" name="wash_status" value="in_progress">
-                                <button class="text-blue-600 hover:text-blue-800 text-xs font-medium">Mulai Cuci</button>
-                            @else
-                                <input type="hidden" name="wash_status" value="done">
-                                <button class="text-green-600 hover:text-green-800 text-xs font-medium">Selesai</button>
-                            @endif
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
-        @else
-        <p class="text-gray-500 text-sm">Tidak ada antrian aktif saat ini.</p>
-        @endif
+<div class="card" style="padding:1.25rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <h3 style="font-size:.95rem;font-weight:700;color:var(--dark)">Antrian Cuci Aktif <span class="badge badge-gold" style="margin-left:.5rem">{{ $activeWashes->count() }}</span></h3>
     </div>
+    @if($activeWashes->count() > 0)
+    <table>
+        <thead><tr><th>Invoice</th><th>Customer</th><th>Plat</th><th>Layanan</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>
+        @foreach($activeWashes as $w)
+        <tr>
+            <td class="mono"><a href="{{ route('transactions.show', $w) }}" style="color:var(--gold-dark);text-decoration:none">{{ $w->invoice_number }}</a></td>
+            <td>{{ $w->customerProfile->user->name ?? 'Walk-in' }}</td>
+            <td style="font-weight:700">{{ $w->plate_number }}</td>
+            <td>@foreach($w->details as $d)<span class="badge badge-gray" style="margin-right:3px">{{ $d->service_name }}</span>@endforeach</td>
+            <td><span class="badge {{ $w->wash_status==='waiting' ? 'badge-yellow' : 'badge-blue' }}">{{ $w->wash_status==='waiting' ? 'Menunggu' : 'Dicuci' }}</span></td>
+            <td>
+                <form method="POST" action="{{ route('transactions.update-status', $w) }}" style="display:inline">@csrf @method('PATCH')
+                    @if($w->wash_status==='waiting')
+                    <input type="hidden" name="wash_status" value="in_progress"><button class="btn-dark btn-sm" type="submit">Mulai</button>
+                    @else
+                    <input type="hidden" name="wash_status" value="done"><button class="btn-gold btn-sm" type="submit" style="width:auto">Selesai</button>
+                    @endif
+                </form>
+            </td>
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
+    @else
+    <div class="empty-state"><p>Tidak ada antrian aktif saat ini ✨</p></div>
+    @endif
+</div>
 @endsection
 
-@push('head')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-@endpush
-
+@push('head')<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>@endpush
 @push('scripts')
 <script>
-const ctx = document.getElementById('revenueChart');
-if (ctx) {
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {!! json_encode($revenueChart->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('d/m'))) !!},
-            datasets: [{
-                label: 'Revenue (Rp)',
-                data: {!! json_encode($revenueChart->pluck('total')) !!},
-                backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                borderRadius: 6,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { callback: v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v) } }
-            }
-        }
-    });
-}
+new Chart(document.getElementById('revenueChart'), {
+    type:'bar',
+    data:{
+        labels:{!! json_encode($revenueChart->pluck('date')->map(fn($d)=>\Carbon\Carbon::parse($d)->format('d/m'))) !!},
+        datasets:[{label:'Revenue',data:{!! json_encode($revenueChart->pluck('total')) !!},backgroundColor:'#f59e0b',borderRadius:6,borderSkipped:false}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'Rp '+(v/1000)+'k'},grid:{color:'#f5f5f4'}},x:{grid:{display:false}}}}
+});
 </script>
 @endpush

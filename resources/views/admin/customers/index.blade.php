@@ -1,50 +1,31 @@
 @extends('layouts.app')
 @section('title', 'Daftar Customer')
-@section('header')
-    <div class="flex items-center justify-between">
-        <h2 class="font-semibold text-xl text-gray-800">Daftar Customer</h2>
-        <a href="{{ route('admin.customers.create') }}" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">+ Tambah Customer</a>
-    </div>
-@endsection
+@section('header')<h2>Daftar Customer</h2>@endsection
+@section('actions')<a href="{{ route('admin.customers.create') }}" class="btn-gold btn-sm">+ Tambah Customer</a>@endsection
 @section('content')
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-    <form method="GET" class="flex gap-3">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / HP / member code..." class="rounded-lg border-gray-300 text-sm flex-1">
-        <button type="submit" class="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg">Cari</button>
-    </form>
+<div class="card" style="padding:1rem;margin-bottom:1rem">
+    <form method="GET" style="display:flex;gap:.5rem"><input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / HP / member code..." class="form-input" style="flex:1"><button type="submit" class="btn-dark btn-sm">Cari</button></form>
 </div>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50"><tr>
-            <th class="text-left py-3 px-4 font-medium text-gray-500">Member</th>
-            <th class="text-left py-3 px-4 font-medium text-gray-500">Nama</th>
-            <th class="text-left py-3 px-4 font-medium text-gray-500">HP</th>
-            <th class="text-center py-3 px-4 font-medium text-gray-500">Total Cuci</th>
-            <th class="text-center py-3 px-4 font-medium text-gray-500">Poin</th>
-            <th class="text-center py-3 px-4 font-medium text-gray-500">Reward</th>
-            <th class="text-center py-3 px-4 font-medium text-gray-500">Aksi</th>
-        </tr></thead>
+<div class="card" style="overflow:hidden">
+    <table>
+        <thead><tr><th>Member</th><th>Nama</th><th>HP</th><th style="text-align:center">Cuci</th><th style="text-align:center">Poin</th><th style="text-align:center">Reward</th><th style="text-align:center">Aksi</th></tr></thead>
         <tbody>
         @forelse($customers as $c)
-        <tr class="border-t border-gray-100 hover:bg-gray-50">
-            <td class="py-3 px-4 font-mono text-xs text-indigo-600">{{ $c->member_code }}</td>
-            <td class="py-3 px-4 font-medium">{{ $c->user->name ?? '-' }}</td>
-            <td class="py-3 px-4 text-gray-600">{{ $c->phone }}</td>
-            <td class="py-3 px-4 text-center font-semibold">{{ $c->total_washes }}</td>
-            <td class="py-3 px-4 text-center"><span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs font-medium">{{ $c->total_points }}</span></td>
-            <td class="py-3 px-4 text-center">
-                @if($c->getAvailableFreeWashes() > 0)<span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-xs font-medium">{{ $c->getAvailableFreeWashes() }} free</span>@else<span class="text-gray-400 text-xs">-</span>@endif
-            </td>
-            <td class="py-3 px-4 text-center">
-                <a href="{{ route('admin.customers.show', $c) }}" class="text-indigo-600 hover:underline text-xs mr-1">Detail</a>
-                <a href="{{ route('admin.customers.edit', $c) }}" class="text-gray-600 hover:underline text-xs">Edit</a>
+        <tr>
+            <td class="mono" style="color:var(--gold-dark);font-weight:600">{{ $c->member_code }}</td>
+            <td style="font-weight:600">{{ $c->user->name ?? '-' }}</td>
+            <td style="color:var(--stone-500)">{{ $c->phone }}</td>
+            <td style="text-align:center;font-weight:700">{{ $c->total_washes }}</td>
+            <td style="text-align:center"><span class="badge badge-gold">{{ $c->total_points }}</span></td>
+            <td style="text-align:center">@if($c->getAvailableFreeWashes()>0)<span class="badge badge-green">{{ $c->getAvailableFreeWashes() }} free</span>@else<span style="color:var(--stone-300)">-</span>@endif</td>
+            <td style="text-align:center">
+                <a href="{{ route('admin.customers.show',$c) }}" class="btn-outline btn-sm" style="margin-right:4px">Detail</a>
+                <a href="{{ route('admin.customers.edit',$c) }}" class="btn-outline btn-sm">Edit</a>
             </td>
         </tr>
-        @empty
-        <tr><td colspan="7" class="py-8 text-center text-gray-500">Belum ada customer</td></tr>
-        @endforelse
+        @empty<tr><td colspan="7"><div class="empty-state"><p>Belum ada customer</p></div></td></tr>@endforelse
         </tbody>
     </table>
-    <div class="px-4 py-3 border-t border-gray-200">{{ $customers->withQueryString()->links() }}</div>
+    <div style="padding:.75rem 1rem;border-top:1px solid var(--stone-200)">{{ $customers->withQueryString()->links() }}</div>
 </div>
 @endsection
